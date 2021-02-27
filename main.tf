@@ -16,20 +16,40 @@ provider "aws" {
 
 resource "aws_vpc" "aws_aka"{
    cidr_block = var.vpc_adr
+   enable_dns_hostnames = var.enable_dns_hostnames
+   enable_dns_support = var.enable_dns_support
    tags = {
-    env      = "test"
     Name = var.vpc_name
   }	
 }
 
-resource "aws_subnet" "subnet_aka_1"{
- cidr_block = var.subnet_adr
+resource "aws_subnet" "subnet_public"{
+ cidr_block = "10.0.1.0/24"
  vpc_id = aws_vpc.aws_aka.id
- availability_zone = "eu-west-3a" 
+ map_public_ip_on_launch = true
+ availability_zone = "us-west-2a" 
 
  tags = {
-   env = "test"
-   Name = var.subnet_name
+   Name = "Subnet public"
  }
+}
+
+resource "aws_subnet" "subnet_private"{
+ cidr_block = "10.0.2.0/24"
+ vpc_id = aws_vpc.aws_aka.id
+ map_public_ip_on_launch = false
+ availability_zone = "us-west-2a"
+
+ tags = {
+   Name = "Subnet private"
+ }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.aws_aka.id
+
+  tags = {
+    Name = "internet gateway"
+ }  
 }
 
